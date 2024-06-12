@@ -94,7 +94,7 @@ const ViewOrders = () => {
     switch (status) {
       case "Pending":
         return "text-yellow-500";
-      case "Delivered":
+      case "Deliverd":
         return "text-green-500";
       case "Dispatched":
         return "text-blue-500";
