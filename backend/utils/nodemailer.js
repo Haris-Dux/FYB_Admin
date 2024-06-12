@@ -1,15 +1,15 @@
 import nodemailer from "nodemailer";
 
 export async function sendEmail(to, from) {
-  const { email,g_Otp } = to;
-  let output = `
+  const { email, g_Otp } = to;
+  let output =  output = `
   <h3>Password Reset Code</h3>
   <p>This link will expire in 15 minutes</p>
   <p> ${g_Otp}</p>
-`;
+`;;
 
   let transport = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.titan.email",
     port: 587,
     secure: false,
     auth: {
@@ -22,12 +22,12 @@ export async function sendEmail(to, from) {
   });
 
   let mailoptions = {
-    from,
-    to: email,
-    subject:"Reset Password Code",
+    from: process.env.EMAIL_AUTH_USER_EMAIL,
+    to: email ,
+    subject: "Reset Password Email",
     html: output,
   };
- 
+
   transport.sendMail(mailoptions, (error, info) => {
     if (error) {
       return false;
@@ -35,4 +35,3 @@ export async function sendEmail(to, from) {
     return true;
   });
 }
-
