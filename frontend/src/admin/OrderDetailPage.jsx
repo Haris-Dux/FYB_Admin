@@ -59,7 +59,6 @@ const OrderDetailPage = () => {
         dispatch(getAllOrdersAsync());
       }
     });
-    setSelectedStatus(null);
     setIsOpen(false);
   };
 
@@ -88,9 +87,7 @@ const OrderDetailPage = () => {
                   type="button"
                   onClick={toggleDropdown}
                 >
-                  {data.orderProgress
-                    ? `${data.orderProgress}`
-                    : "Update Order Status"}
+                   {selectedStatus?.length > 1 ? `${selectedStatus}`:  `${data.orderProgress}`}
 
                   <IoIosArrowDown
                     size={18}
@@ -122,10 +119,10 @@ const OrderDetailPage = () => {
                         Dispatched
                       </li>
                       <li
-                        onClick={() => handleStatusSelect("Deliverd")}
+                        onClick={() => handleStatusSelect("Delivered")}
                         className="px-3 py-2.5 flex items-center text-gray-900 dark:text-gray-100 dark:hover:bg-gray-600 hover:bg-gray-200 cursor-pointer"
                       >
-                        Deliverd
+                        Delivered
                       </li>
                       <li
                         onClick={() => handleStatusSelect("Cancelled")}

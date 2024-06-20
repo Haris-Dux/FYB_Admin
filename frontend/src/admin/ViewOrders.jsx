@@ -84,7 +84,7 @@ const ViewOrders = () => {
     }
   }, [dispatch, page, status, searchQuery]);
 
-  const statusData = ["Pending", "Deliverd", "Dispatched", "Cancelled"];
+  const statusData = ["Pending", "Delivered", "Dispatched", "Cancelled"];
 
   const handleStatusChange = (status) => {
     navigate(`/admin/view_orders?status=${status}`);
@@ -94,7 +94,7 @@ const ViewOrders = () => {
     switch (status) {
       case "Pending":
         return "text-yellow-500";
-      case "Deliverd":
+        case "Delivered":
         return "text-green-500";
       case "Dispatched":
         return "text-blue-500";

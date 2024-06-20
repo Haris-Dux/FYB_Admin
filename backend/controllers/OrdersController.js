@@ -1,5 +1,7 @@
 import { OrdersModel } from "../models/OrdersModel.js";
+import { UserModel } from "../models/User.Model.js";
 import { setMongoose } from "../utils/Mongoose.js";
+import { sendEmail } from "../utils/nodemailer.js";
 
 export const updateOrder = async (req, res, next) => {
   try {
@@ -9,23 +11,23 @@ export const updateOrder = async (req, res, next) => {
       throw new Error("No ID Provided");
     }
     const order = await OrdersModel.findOne({ _id: id });
-
+    const user = await UserModel.findOne({ _id: order.userID });
     if (!order) {
       throw new Error("No Order Data Found");
-    }
+    };
     if (address) {
       orderQuery = { ...orderQuery, address };
-    }
+    };
     if (phone) {
       orderQuery = { ...orderQuery, phone };
-    }
-    console.log(id, orderProgress);
+    };
     if (orderProgress) {
       orderQuery = { ...orderQuery, orderProgress };
-    }
+    };
     if (Object.keys(orderQuery).length === 0)
       throw new Error("No fileds Updated");
     await OrdersModel.findByIdAndUpdate(id, orderQuery);
+    await sendEmail({email:user.email,orderProgress,orderId:order.OrderID,subject:"Order Status Updated"});
     return res.status(200).json({ message: "Order Data Updated" });
   } catch (error) {
     return res.status(500).json({ error: error.message });

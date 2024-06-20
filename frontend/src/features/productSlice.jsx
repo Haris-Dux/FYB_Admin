@@ -20,8 +20,7 @@ const getProductsUrl = `/api/products/getProducts`;
 const createProductUrl = "/api/products/addProduct";
 const updateProductUrl = "/api/products/updateProduct";
 const getsingleProductUrl = "/api/products/getProductById";
-// const deleteProductUrl = "http://localhost:4000/api/products/deleteProduct";
-// const getLatestProductUrl = "http://localhost:4000/api/products/getLatestPRoducts";
+const deleteProductUrl = "/api/products/deleteProduct";
 
 //CREATE ASYNC THUNK
 export const createProductAsync = createAsyncThunk(
@@ -86,12 +85,29 @@ export const getsingleProductAsync = createAsyncThunk(
   }
 );
 
+//DELETE PRODUCT
+export const deleteProductAsync = createAsyncThunk(
+  "Shop/deleteProduct",
+  async (id) => {
+    try {
+      const response = await axios.post(deleteProductUrl, { id });
+      toast.success(response.data.message);
+      return response.data;
+    } catch (error) {
+      toast.error(error.response.data.error);
+    }
+  }
+);
+
 
 const productSlice = createSlice({
   name: "productSlice",
   initialState,
   reducers: {
-    resetGoals: (state) => initialState,
+    deleteProduct: (state, action) => {
+      const productIdToDelete = action.payload;
+      state.products.productData = state.products.productData.filter(product => product.id !== productIdToDelete);
+    },
   },
 
   extraReducers: (builder) => {
@@ -117,31 +133,17 @@ const productSlice = createSlice({
       .addCase(getsingleProductAsync.fulfilled, (state, action) => {
         state.isLoading = false;
         state.singleProduct = action.payload;
+      })
+
+      .addCase(deleteProductAsync.pending, (state, action) => {
+        state.deleteLoading = true;
+      })
+      .addCase(deleteProductAsync.fulfilled, (state, action) => {
+        state.deleteLoading = false;
       });
 
-    // .addCase(deleteGoalsAsync.pending, (state, action) => {
-    //   // state.isLoading = true;
-    //   state.deleteLoading = true;
-    // })
-    // .addCase(deleteGoalsAsync.fulfilled, (state, action) => {
-    //   // state.isLoading = false;
-    //   state.deleteLoading = false;
-    //   state.isSuccess = true;
-    //   state.products = state.products.filter(
-    //     (product) => product._id !== action.payload.id
-    //   );
-    // })
-  
-
-    // .addCase(updateProductAsync.pending, (state, action) => {
-    //   state.updateLoading = true;
-    // })
-    // .addCase(updateProductAsync.fulfilled, (state, action) => {
-    //   state.updateLoading = false;
-    //   state.isSuccess = true;
-    // });
   },
 });
 
-export const { resetGoals } = productSlice.actions;
+export const { deleteProduct } = productSlice.actions;
 export default productSlice.reducer;

@@ -1,16 +1,29 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllProductsAsync } from "../features/productSlice";
+import { deleteProduct, deleteProductAsync, getAllProductsAsync } from "../features/productSlice";
 import Loader from "react-loaders";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import DeleteModal from "./DeleteModal";
+
 
 const AllProducts = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const [productId, setProductId] = useState("");
+  const [modalOpen, setModalOpen] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef(null);
+
+  const closeModal = () => {
+    setModalOpen(false);
+  };
+
+  const openModal = (id) => {
+    setModalOpen(true);
+    setProductId(id)
+  }
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -29,7 +42,7 @@ const AllProducts = () => {
     };
   }, []);
 
-  const { products , isLoading } = useSelector((state) => state.product);
+  const { products , isLoading , deleteLoading } = useSelector((state) => state.product);
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page")) || 1;
   const category = searchParams.get("category") || "All";
@@ -80,6 +93,16 @@ const AllProducts = () => {
   const handleSearch = (e) => {
     const query = e.target.value.trim();
     setSearchQuery(query);
+  };
+
+   // HANDLE DELETE
+   const handleDelete = (id) => {
+    dispatch(deleteProductAsync(id)).then((res) => {
+      if (res.payload.message) {
+        dispatch(deleteProduct(id));
+        setModalOpen(false);
+      }
+    });
   };
 
   return (
@@ -215,9 +238,14 @@ const AllProducts = () => {
                           className="h-[250px] cursor-pointer w-full rounded-t-md object-contain"
                         />
                         <div className="p-4">
+                        <div className="flex items-center justify-between">
                           <h1 className="inline-flex items-center text-lg font-semibold">
                             {data?.name}
                           </h1>
+                          <button onClick={() => openModal(data?.id)}  className=" text-red-600 text-xl transform transition-transform hover:scale-150">
+                              <MdOutlineDeleteOutline />
+                            </button>
+                          </div>
                           {data.sale_price > 0 ? (
                             <div className="flex items-center gap-x-2">
                               <h1 className="items-center text-lg font-semibold">
@@ -370,6 +398,15 @@ const AllProducts = () => {
                       </ul>
                     </nav>
                   </div>
+
+                  <DeleteModal
+                    modalOpen={modalOpen}
+                    closeModal={closeModal}
+                    handleDelete={handleDelete}
+                    productId={productId}
+                    deleteLoading={deleteLoading}
+                  />
+
                 </>
               ) : (
                 <div className="playfair text-xl flex font-medium uppercase items-center  pt-10 ">

@@ -32,7 +32,7 @@ const orderSchema = new mongoose.Schema(
     orderProgress:{
       type: String,
       default:"Pending",
-      enum:['Pending','Deliverd','Dispatched','Cancelled']
+      enum:['Pending','Delivered','Dispatched','Cancelled']
     } ,
     couponUsed: {
       code: { type: String },

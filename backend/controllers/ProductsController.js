@@ -130,9 +130,9 @@ export const updateProduct = async (req, res, next) => {
       if (imageData.downloadURL && product.image.downloadURL) {
         await deleteImageFromFirebase(product.image.downloadURL);
       }
-    }
-    if(imageData){
-      updateQuery = { ...updateQuery, image:imageData };
+      if(imageData){
+        updateQuery = { ...updateQuery, image:imageData };
+      }
     }
     if (Object.keys(updateQuery).length === 0)
       throw new Error("No fileds Updated");
@@ -145,14 +145,14 @@ export const updateProduct = async (req, res, next) => {
 
 export const deleteProduct = async (req, res, next) => {
   try {
-    const productId = req.body;
-    if (!productId) throw new Error("Product Id not Found");
-    const product = await ProductsModel.findById(productId);
+    const {id} = req.body;
+    if (!id) throw new Error("Product Id not Found");
+    const product = await ProductsModel.findById(id);
     if (!product) {
       throw new Error("Product not found");
     }
     await deleteImageFromFirebase(product.image.downloadURL);
-    await ProductsModel.findByIdAndDelete({ _id: productId });
+    await ProductsModel.findByIdAndDelete(id);
     return res.status(200).json({ message: "Deleted Succesfully" });
   } catch (error) {
     return res.status(500).json({ error: error.message });
