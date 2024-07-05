@@ -119,8 +119,8 @@ export const updateProduct = async (req, res, next) => {
       updateQuery = { ...updateQuery, latest };
     }
     const file = req.file;
-    let imageData = {};
     if (file) {
+      let imageData = {};
       const result = await uploadImageToFirebase(file, "FYB Images");
       imageData = {
         downloadURL: result.downloadURL,

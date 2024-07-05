@@ -222,7 +222,7 @@ const ViewOrders = () => {
                           Date
                         </th>
                         <th className="px-7 py-4" scope="col">
-                          Phone
+                          Name
                         </th>
                         <th className="px-7 py-4" scope="col">
                           Amount
@@ -253,7 +253,7 @@ const ViewOrders = () => {
                             <td className="px-7 py-4">
                               {new Date(data?.createdAt).toLocaleDateString()}
                             </td>
-                            <td className="px-7 py-4">{data.phone}</td>
+                            <td className="px-7 py-4">{data.name}</td>
                             <td className="px-7 py-4">{data.totalAmount}</td>
                             <td
                               className={`px-7 py-4 text-md font-medium ${getStatusColor(
