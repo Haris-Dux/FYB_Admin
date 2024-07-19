@@ -16,7 +16,7 @@ const productsSchema = new mongoose.Schema(
     },
     sale_price: {
       type: Number,
-      default:null
+      default: null,
     },
     stock: {
       type: Number,
@@ -27,19 +27,19 @@ const productsSchema = new mongoose.Schema(
       name: { type: String },
       type: { type: String },
     },
-    category:{
-        type: String,
-        required: [true, "category required"],
-        enum:["Skincare","Body Care","Haircare","Cosmetics"]
+    category: {
+      type: String,
+      required: [true, "category required"],
+      enum: ["Skincare", "Body Care", "Haircare", "Cosmetics", "Bundle"],
     },
-    subCategory:{
-        type: String,
-        default:null,
+    subCategory: {
+      type: String,
+      default: null,
     },
-    latest:{
-        type: Boolean,
-        default:false,
-    }
+    latest: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
