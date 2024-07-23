@@ -11,9 +11,16 @@ import Loader from "react-loaders";
 const UpdateProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const categories = ["Skincare", "Body Care", "Haircare", "Cosmetics"];
+  const categories = [
+    "Skincare",
+    "Body Care",
+    "Haircare",
+    "Cosmetics",
+    "Bundle",
+  ];
 
   const { singleProduct, isLoading } = useSelector((state) => state.product);
+
   useEffect(() => {
     dispatch(getsingleProductAsync(id));
   }, [id]);
@@ -108,8 +115,9 @@ const UpdateProduct = () => {
   const validateSubCategory = () => {
     if (!formdata.category) return true;
     if (formdata.category === "Cosmetics") return true;
+    if (formdata.category === "Bundle") return true;
     const validSubCategories = subCategories[formdata.category];
-    return validSubCategories.includes(formdata.subCategory);
+    return validSubCategories?.includes(formdata.subCategory);
   };
 
   // HANDLE SUBMIT
@@ -185,7 +193,9 @@ const UpdateProduct = () => {
       <section className="bg-[#E5E5E5] dark:bg-gray-900">
         <div className="py-8 px-18 sm:px-20 md:px-16 lg:px-14 mx-auto max-w-full lg:py-10">
           <h2 className="mb-5 playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
-            Update product
+            {singleProduct?.category === "product"
+              ? "Update product"
+              : "Update bundle"}
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
@@ -195,7 +205,9 @@ const UpdateProduct = () => {
                   className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="name"
                 >
-                  Product Name
+                  {singleProduct?.category === "product"
+                    ? "Product Name"
+                    : "Bundle Name"}
                 </label>
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
@@ -276,56 +288,77 @@ const UpdateProduct = () => {
                 />
               </div>
 
-              {/* CATEGORY */}
-              <div>
-                <label
-                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="category"
-                >
-                  Category
-                </label>
-                <select
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="category"
-                  value={formdata.category}
-                  onChange={handleCategoryChange}
-                >
-                  <option value="" disabled>
-                    Select category
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {singleProduct?.category === "product" ? (
+                <>
+                  <div>
+                    <label
+                      className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="category"
+                    >
+                      Category
+                    </label>
+                    <select
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      id="category"
+                      value={formdata.category}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="" disabled>
+                        Select category
+                      </option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* SUB CATEGORY */}
-              <div>
-                <label
-                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="category"
-                >
-                  Sub Category
-                </label>
-                <select
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="subcategory"
-                  value={formdata.subCategory}
-                  onChange={handleSubCategoryChange}
-                  disabled={!formdata.category}
-                >
-                  <option value="" disabled>
-                    Select subcategory
-                  </option>
-                  {subCategories[formdata.category]?.map((subCategory) => (
-                    <option key={subCategory} value={subCategory}>
-                      {subCategory}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div>
+                    <label
+                      className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="category"
+                    >
+                      Sub Category
+                    </label>
+                    <select
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      id="subcategory"
+                      value={formdata.subCategory}
+                      onChange={handleSubCategoryChange}
+                      disabled={!formdata.category}
+                    >
+                      <option value="" disabled>
+                        Select subcategory
+                      </option>
+                      {subCategories[formdata.category]?.map((subCategory) => (
+                        <option key={subCategory} value={subCategory}>
+                          {subCategory}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label
+                      className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="category"
+                    >
+                      Category
+                    </label>
+
+                    <input
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      id="category"
+                      name="category"
+                      type="text"
+                      value={formdata?.category}
+                    />
+                  </div>
+                </>
+              )}
 
               {/* DESC */}
               <div className="sm:col-span-2">
@@ -348,23 +381,25 @@ const UpdateProduct = () => {
               </div>
 
               {/* LATEST PRODUCTS */}
-              <div className="flex items-center">
-                <input
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  defaultValue=""
-                  id="default-checkbox"
-                  type="checkbox"
-                  name="latest"
-                  checked={formdata.latest}
-                  onChange={handleCheckChange}
-                />
-                <label
-                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  htmlFor="default-checkbox"
-                >
-                  Latest Products
-                </label>
-              </div>
+              {singleProduct?.category === "product" ? (
+                <div className="flex items-center">
+                  <input
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    defaultValue=""
+                    id="default-checkbox"
+                    type="checkbox"
+                    name="latest"
+                    checked={formdata.latest}
+                    onChange={handleCheckChange}
+                  />
+                  <label
+                    className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    htmlFor="default-checkbox"
+                  >
+                    Latest Products
+                  </label>
+                </div>
+              ) : null}
 
               {/* IMAGE */}
               {singleProduct?.image && (
@@ -372,11 +407,11 @@ const UpdateProduct = () => {
                   <div className="flex items-center justify-center w-full relative">
                     <div className="flex flex-col py-2 items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg  bg-gray-50 dark:bg-gray-700 dark:border-gray-600">
                       <img
-                       src={
-                        formdata.file
-                          ? URL.createObjectURL(formdata.file)
-                          : singleProduct?.image?.downloadURL
-                      }
+                        src={
+                          formdata.file
+                            ? URL.createObjectURL(formdata.file)
+                            : singleProduct?.image?.downloadURL
+                        }
                         // src={singleProduct?.image?.downloadURL}
                         alt="Product Image"
                         className="h-full"
@@ -433,7 +468,7 @@ const UpdateProduct = () => {
                 type="button"
                 className={`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-center`}
               >
-               <Loader type="ball-beat" active={true} />
+                <Loader type="ball-beat" active={true} />
               </button>
             ) : (
               <button
