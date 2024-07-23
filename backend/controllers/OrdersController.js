@@ -73,7 +73,7 @@ export const getAllOrders = async (req, res, next) => {
       page,
       orders,
     };
-
+    setMongoose();
     return res.status(200).json(response);
   } catch (err) {
     console.log(err);
