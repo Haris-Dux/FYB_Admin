@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteProduct, deleteProductAsync, getAllProductsAsync } from "../features/productSlice";
+import {
+  deleteProduct,
+  deleteProductAsync,
+  getAllProductsAsync,
+} from "../features/productSlice";
 import Loader from "react-loaders";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import DeleteModal from "./DeleteModal";
-
 
 const AllProducts = () => {
   const navigate = useNavigate();
@@ -22,8 +25,8 @@ const AllProducts = () => {
 
   const openModal = (id) => {
     setModalOpen(true);
-    setProductId(id)
-  }
+    setProductId(id);
+  };
 
   const toggleDropdown = () => {
     setIsOpen(!isOpen);
@@ -42,7 +45,9 @@ const AllProducts = () => {
     };
   }, []);
 
-  const { products , isLoading , deleteLoading } = useSelector((state) => state.product);
+  const { products, isLoading, deleteLoading } = useSelector(
+    (state) => state.product
+  );
   const [searchParams] = useSearchParams();
   const page = parseInt(searchParams.get("page")) || 1;
   const category = searchParams.get("category") || "All";
@@ -95,8 +100,8 @@ const AllProducts = () => {
     setSearchQuery(query);
   };
 
-   // HANDLE DELETE
-   const handleDelete = (id) => {
+  // HANDLE DELETE
+  const handleDelete = (id) => {
     dispatch(deleteProductAsync(id)).then((res) => {
       if (res.payload.message) {
         dispatch(deleteProduct(id));
@@ -108,10 +113,10 @@ const AllProducts = () => {
   return (
     <>
       <section>
-        <div className="bg-[#E5E5E5] dark:bg-gray-900 mx-auto min-h-screen max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
+        <div className="bg-[#ecebeb] dark:bg-gray-900 mx-auto min-h-screen max-w-screen-xl px-4 py-8 sm:px-6 sm:py-10 lg:px-8">
           {isLoading ? (
             <div className="flex justify-center items-center min-h-screen">
-               <Loader type="ball-beat" active={true} />
+              <Loader type="ball-beat" active={true} />
             </div>
           ) : (
             <>
@@ -228,21 +233,24 @@ const AllProducts = () => {
 
               {products?.productData?.length > 0 ? (
                 <>
-                  <ul  className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {products?.productData?.map((data) => (
-                      <li className="w-[300px]  rounded-md border bg-gray-200">
+                      <li className="w-[300px]  rounded-md border bg-white border-gray-200 shadow-md">
                         <img
-                         onClick={() => handleUpdate(data?.id)}
+                          onClick={() => handleUpdate(data?.id)}
                           src={data?.image?.downloadURL}
                           alt="Laptop"
-                          className="h-[250px] cursor-pointer w-full rounded-t-md object-contain"
+                          className="h-[250px] cursor-pointer w-full rounded-t-md object-cover"
                         />
                         <div className="p-4">
-                        <div className="flex items-center justify-between">
-                          <h1 className="inline-flex items-center text-lg font-semibold">
-                            {data?.name}
-                          </h1>
-                          <button onClick={() => openModal(data?.id)}  className=" text-red-600 text-xl transform transition-transform hover:scale-150">
+                          <div className="flex items-center justify-between">
+                            <h1 className="inline-flex items-center text-lg font-semibold">
+                              {data?.name}
+                            </h1>
+                            <button
+                              onClick={() => openModal(data?.id)}
+                              className=" text-red-600 text-xl transform transition-transform hover:scale-150"
+                            >
                               <MdOutlineDeleteOutline />
                             </button>
                           </div>
@@ -279,13 +287,13 @@ const AllProducts = () => {
                             </h1>
                           )}
                           <div className="mt-4">
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-900">
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-900">
                               {data?.category}
                             </span>
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-3 py-1 text-[11px] font-semibold text-gray-900">
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-3 py-1 text-[11px] font-semibold text-gray-900">
                               {data?.subCategory}
                             </span>
-                            <span className="mb-2 mr-2 inline-block rounded-full bg-white px-4 py-1 text-[11px] font-semibold text-gray-900">
+                            <span className="mb-2 mr-2 inline-block rounded-full bg-gray-100 px-4 py-1 text-[11px] font-semibold text-gray-900">
                               {new Date(data?.createdAt).toLocaleDateString()}
                             </span>
                           </div>
@@ -406,7 +414,6 @@ const AllProducts = () => {
                     productId={productId}
                     deleteLoading={deleteLoading}
                   />
-
                 </>
               ) : (
                 <div className="playfair text-xl flex font-medium uppercase items-center  pt-10 ">

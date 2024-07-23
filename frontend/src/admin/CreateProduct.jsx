@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createProductAsync } from "../features/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "react-loaders";
@@ -22,18 +22,27 @@ const CreateProduct = () => {
   };
 
   const { createLoading } = useSelector((state) => state.product);
-  
+
+  const [mainCategory, setMainCategory] = useState("product");
   const [formdata, setFormdata] = useState({
     name: "",
     price: "",
     sale_price: "",
-    category: "",
+    category: mainCategory === "bundle" ? "Bundle" : "",
     subCategory: "",
     quantity: "",
     description: "",
     file: null,
     latest: false,
   });
+
+  // useEffect to update category based on mainCategory
+  useEffect(() => {
+    setFormdata((prevFormdata) => ({
+      ...prevFormdata,
+      category: mainCategory === "bundle" ? "Bundle" : "",
+    }));
+  }, [mainCategory]);
 
   const handleCategoryChange = (e) => {
     const selectedCategory = e.target.value;
@@ -77,20 +86,20 @@ const CreateProduct = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("filename", formdata.file);
-      formData.append("name", formdata.name);
-      formData.append("price", formdata.price);
-      formData.append("sale_price", formdata.sale_price);
-      formData.append("category", formdata.category);
-      formData.append("subCategory", formdata.subCategory);
-      formData.append("stock", formdata.quantity);
-      formData.append("description", formdata.description);
-      formData.append("latest", formdata.latest);
+    const formData = new FormData();
+    formData.append("filename", formdata.file);
+    formData.append("name", formdata.name);
+    formData.append("price", formdata.price);
+    formData.append("sale_price", formdata.sale_price);
+    formData.append("category", formdata.category);
+    formData.append("subCategory", formdata.subCategory);
+    formData.append("stock", formdata.quantity);
+    formData.append("description", formdata.description);
+    formData.append("latest", formdata.latest);
 
-      try {
-        dispatch(createProductAsync(formData)).then((res)=>{
-         if(res.payload.message){
+    try {
+      dispatch(createProductAsync(formData)).then((res) => {
+        if (res.payload.message) {
           setFormdata({
             name: "",
             price: "",
@@ -101,13 +110,16 @@ const CreateProduct = () => {
             description: "",
             file: null,
             latest: false,
-          })
-         }
-        })
-      } catch (error) {
-        throw new Error(error)
-      }
-    
+          });
+        }
+      });
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
+
+  const handleCategory = (property) => {
+    setMainCategory(property);
   };
 
   return (
@@ -115,8 +127,67 @@ const CreateProduct = () => {
       <section className="bg-[#E5E5E5] dark:bg-gray-900">
         <div className="py-8 px-18 sm:px-20 md:px-16 lg:px-14 mx-auto max-w-full lg:py-10">
           <h2 className="mb-5 playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
-            Add a new product
+            {mainCategory === "product" ? "Add new product" : "Add new bundle"}
           </h2>
+
+          {/* SELECTION */}
+          <div className="selection w-full mb-6 ">
+            <fieldset className="flex justify-start items-center gap-x-6">
+              {/* ------- PRODUCT RADIO -------  */}
+              <div className="product">
+                <label
+                  onClick={() => handleCategory("product")}
+                  htmlFor="DeliveryStandard"
+                  className={`flex w-40 cursor-pointer justify-between gap-4 rounded-lg border border-gray-100 bg-white p-4 text-sm font-medium shadow-sm hover:border-gray-200
+                     ${
+                       mainCategory === "product"
+                         ? "border-[#EC72AF] ring-2 ring-[#EC72AF] focus:ring-[#EC72AF]"
+                         : ""
+                     }
+                      `}
+                >
+                  <div>
+                    <p className="text-gray-700">Product</p>
+                  </div>
+
+                  <input
+                    type="radio"
+                    name="DeliveryOption"
+                    value="category"
+                    id="DeliveryStandard"
+                    className="size-5 border-gray-300 text-[#EC72AF]"
+                  />
+                </label>
+              </div>
+
+              {/* ------- BUNDLE RADIO -------  */}
+              <div className="bundle">
+                <label
+                  onClick={() => handleCategory("bundle")}
+                  htmlFor="DeliveryPriority"
+                  className={`flex w-40 cursor-pointer justify-between gap-4 rounded-lg border border-gray-100 bg-white p-4 text-sm font-medium shadow-sm hover:border-gray-200
+                    ${
+                      mainCategory === "bundle"
+                        ? "border-[#EC72AF] ring-2 ring-[#EC72AF] focus:ring-[#EC72AF]"
+                        : ""
+                    }
+                     `}
+                >
+                  <div>
+                    <p className="text-gray-700">Bundle</p>
+                  </div>
+                  <input
+                    type="radio"
+                    name="DeliveryOption"
+                    value="category"
+                    id="DeliveryPriority"
+                    className="size-5 border-gray-300 text-[#EC72AF]"
+                  />
+                </label>
+              </div>
+            </fieldset>
+          </div>
+
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
               {/* NAME */}
@@ -125,13 +196,17 @@ const CreateProduct = () => {
                   className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="name"
                 >
-                  Product Name
+                  {mainCategory === "product" ? "Product Name" : "Bundle Name"}
                 </label>
                 <input
                   className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   id="name"
                   name="name"
-                  placeholder="Type product name"
+                  placeholder={`${
+                    mainCategory === "product"
+                      ? "Type product name"
+                      : "Type bundle name"
+                  }`}
                   type="text"
                   value={formdata.name}
                   onChange={(e) =>
@@ -207,56 +282,58 @@ const CreateProduct = () => {
                 />
               </div>
 
-              {/* CATEGORY */}
-              <div>
-                <label
-                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="category"
-                >
-                  Category
-                </label>
-                <select
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="category"
-                  value={formdata.category}
-                  onChange={handleCategoryChange}
-                >
-                  <option value="" disabled>
-                    Select category
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {mainCategory === "product" ? (
+                <>
+                  <div>
+                    <label
+                      className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="category"
+                    >
+                      Category
+                    </label>
+                    <select
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      id="category"
+                      value={formdata.category}
+                      onChange={handleCategoryChange}
+                    >
+                      <option value="" disabled>
+                        Select category
+                      </option>
+                      {categories.map((category) => (
+                        <option key={category} value={category}>
+                          {category}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-              {/* SUB CATEGORY */}
-              <div>
-                <label
-                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="category"
-                >
-                  Sub Category
-                </label>
-                <select
-                  className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="subcategory"
-                  value={formdata.subCategory}
-                  onChange={handleSubCategoryChange}
-                  disabled={!formdata.category}
-                >
-                  <option value="" disabled>
-                    Select subcategory
-                  </option>
-                  {subCategories[formdata.category]?.map((subCategory) => (
-                    <option key={subCategory} value={subCategory}>
-                      {subCategory}
-                    </option>
-                  ))}
-                </select>
-              </div>
+                  <div>
+                    <label
+                      className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                      htmlFor="category"
+                    >
+                      Sub Category
+                    </label>
+                    <select
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      id="subcategory"
+                      value={formdata.subCategory}
+                      onChange={handleSubCategoryChange}
+                      disabled={!formdata.category}
+                    >
+                      <option value="" disabled>
+                        Select subcategory
+                      </option>
+                      {subCategories[formdata.category]?.map((subCategory) => (
+                        <option key={subCategory} value={subCategory}>
+                          {subCategory}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </>
+              ) : null}
 
               {/* DESC */}
               <div className="sm:col-span-2">
@@ -279,23 +356,25 @@ const CreateProduct = () => {
               </div>
 
               {/* LATEST PRODUCTS */}
-              <div className="flex items-center">
-                <input
-                  className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  defaultValue=""
-                  id="default-checkbox"
-                  type="checkbox"
-                  name="latest"
-                  checked={formdata.latest}
-                  onChange={handleCheckChange}
-                />
-                <label
-                  className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
-                  htmlFor="default-checkbox"
-                >
-                  Latest Products
-                </label>
-              </div>
+              {mainCategory === "product" ? (
+                <div className="flex items-center">
+                  <input
+                    className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    defaultValue=""
+                    id="default-checkbox"
+                    type="checkbox"
+                    name="latest"
+                    checked={formdata.latest}
+                    onChange={handleCheckChange}
+                  />
+                  <label
+                    className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+                    htmlFor="default-checkbox"
+                  >
+                    Latest Products
+                  </label>
+                </div>
+              ) : null}
 
               {/* IMAGE */}
               {formdata?.file ? (
@@ -362,9 +441,9 @@ const CreateProduct = () => {
 
             {createLoading ? (
               <button
-              disabled={createLoading}
+                disabled={createLoading}
                 type="button"
-                className= {`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-cente`} 
+                className={`w-36 flex cursor-not-allowed justify-center items-center px-5 py-2.5 mt-2 sm:mt-5 text-sm font-medium text-cente`}
               >
                 <Loader type="ball-beat" active={true} />
               </button>
