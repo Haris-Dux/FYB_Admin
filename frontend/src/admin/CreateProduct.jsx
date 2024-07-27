@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { createProductAsync } from "../features/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import Loader from "react-loaders";
+import BundleDescription from "./BundleDescription";
+import toast from "react-hot-toast";
 
 const CreateProduct = () => {
   const dispatch = useDispatch();
@@ -34,6 +36,12 @@ const CreateProduct = () => {
     description: "",
     file: null,
     latest: false,
+    bundleDescription: {
+      main_heading: "",
+      main_description: "",
+      product_details: [],
+      why_choose_us: [""]
+    }
   });
 
   // useEffect to update category based on mainCategory
@@ -96,6 +104,13 @@ const CreateProduct = () => {
     formData.append("stock", formdata.quantity);
     formData.append("description", formdata.description);
     formData.append("latest", formdata.latest);
+    if( formdata.bundleDescription.product_details.length <= 0){
+      toast.error("Please Add minimum 1 product")
+      return;
+    };
+    if(mainCategory === "bundle"){
+      formData.append("bundleDescription", JSON.stringify(formdata.bundleDescription));
+    };
 
     try {
       dispatch(createProductAsync(formData)).then((res) => {
@@ -110,6 +125,12 @@ const CreateProduct = () => {
             description: "",
             file: null,
             latest: false,
+            bundleDescription: {
+              main_heading: "",
+              main_description: "",
+              product_details: [],
+              why_choose_us: [""]
+            }
           });
         }
       });
@@ -121,6 +142,7 @@ const CreateProduct = () => {
   const handleCategory = (property) => {
     setMainCategory(property);
   };
+
 
   return (
     <>
@@ -336,24 +358,32 @@ const CreateProduct = () => {
               ) : null}
 
               {/* DESC */}
-              <div className="sm:col-span-2">
-                <label
-                  className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
-                  htmlFor="description"
-                >
-                  Description
-                </label>
-                <textarea
-                  className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                  id="description"
-                  placeholder="Your description here"
-                  rows="3"
-                  value={formdata.description}
-                  onChange={(e) =>
-                    setFormdata({ ...formdata, description: e.target.value })
-                  }
-                />
-              </div>
+              {mainCategory === "bundle" ? (
+                <div className="col-span-2">
+                <BundleDescription  
+                    formdata={formdata}
+                    setFormdata={setFormdata}/>
+                </div>
+              ) : (
+                <div className="sm:col-span-2">
+                  <label
+                    className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
+                    htmlFor="description"
+                  >
+                   Product Description
+                  </label>
+                  <textarea
+                    className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                    id="description"
+                    placeholder="Your description here"
+                    rows="3"
+                    value={formdata.description}
+                    onChange={(e) =>
+                      setFormdata({ ...formdata, description: e.target.value })
+                    }
+                  />
+                </div>
+              )}
 
               {/* LATEST PRODUCTS */}
               {mainCategory === "product" ? (

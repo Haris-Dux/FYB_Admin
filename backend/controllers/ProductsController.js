@@ -7,7 +7,7 @@ import { setMongoose } from "../utils/Mongoose.js";
 
 export const addProduct = async (req, res, next) => {
   try {
-    const {
+    let {
       name,
       description,
       price,
@@ -16,8 +16,9 @@ export const addProduct = async (req, res, next) => {
       category,
       subCategory,
       latest,
+      bundleDescription
     } = req.body;
-    if (!name || !description || !price || !stock || !category)
+    if (!name || !price || !stock || !category)
       throw new Error("Please provide all required fields");
     if (parseFloat(price) <= 0) {
       throw new Error("Price must be greater than 0");
@@ -35,6 +36,7 @@ export const addProduct = async (req, res, next) => {
     if (parseFloat(sale_price) <= 0 && parseFloat(price) <= 0) {
       throw new Error("Both Sale price and Price cannot be 0");
     }
+    
     const file = req.file;
     if (!file) throw new Error("Please provide a file");
     const result = await uploadImageToFirebase(file, "FYB Images");
@@ -43,6 +45,12 @@ export const addProduct = async (req, res, next) => {
       name: result.name,
       type: result.type,
     };
+
+  
+     if (typeof bundleDescription === 'string') {
+      bundleDescription = JSON.parse(bundleDescription);
+    }
+
     await ProductsModel.create({
       name,
       description,
@@ -53,6 +61,7 @@ export const addProduct = async (req, res, next) => {
       subCategory,
       sale_price,
       latest,
+      bundleDescription
     });
     return res.status(200).json({ message: "Product Added Successfully" });
   } catch (error) {
@@ -62,7 +71,7 @@ export const addProduct = async (req, res, next) => {
 
 export const updateProduct = async (req, res, next) => {
   try {
-    const {
+    let {
       productId,
       name,
       description,
@@ -72,6 +81,7 @@ export const updateProduct = async (req, res, next) => {
       category,
       subCategory,
       latest,
+      bundleDescription,
     } = req.body;
     const product = await ProductsModel.findById(productId);
     if (!product) {
@@ -99,6 +109,11 @@ export const updateProduct = async (req, res, next) => {
     }
     if (description) {
       updateQuery = { ...updateQuery, description };
+    }
+    if (bundleDescription && typeof bundleDescription === 'string') {
+      bundleDescription = JSON.parse(bundleDescription);
+      console.log(bundleDescription);
+      updateQuery = { ...updateQuery, bundleDescription };
     }
     if (price) {
       updateQuery = { ...updateQuery, price };

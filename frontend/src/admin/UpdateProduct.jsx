@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "react-loaders";
+import UpdateBundleDescription from "./UpdateBundleDescription";
 
 const UpdateProduct = () => {
   const { id } = useParams();
@@ -50,6 +51,12 @@ const UpdateProduct = () => {
     file: null,
     latest: false,
     productId: "",
+    bundleDescription: {
+      main_heading: "",
+      main_description: "",
+      product_details: [],
+      why_choose_us: [""]
+    }
   });
 
   useEffect(() => {
@@ -65,9 +72,17 @@ const UpdateProduct = () => {
         description: singleProduct?.description || "",
         latest: singleProduct?.latest,
         productId: singleProduct.id,
+        bundleDescription: {
+          main_heading: singleProduct?.bundleDescription?.main_heading,
+          main_description: singleProduct?.bundleDescription?.main_description,
+          product_details: singleProduct?.bundleDescription?.product_details,
+          why_choose_us: singleProduct?.bundleDescription?.why_choose_us
+        }
       }));
     }
   }, [singleProduct]);
+
+  console.log('formdata in parent',formdata);
 
   const handleChange = (e, fieldName) => {
     if (e.target.type === "file") {
@@ -165,6 +180,10 @@ const UpdateProduct = () => {
       formData.append("productId", formdata.productId);
     }
 
+    if (formdata.bundleDescription !== singleProduct.bundleDescription) {
+      formData.append("bundleDescription", JSON.stringify(formdata.bundleDescription));
+    }
+
     try {
       dispatch(updateProductAsync(formData)).then((res) => {
         if (res.payload.success) {
@@ -179,6 +198,12 @@ const UpdateProduct = () => {
             file: null,
             latest: false,
             productId: "",
+            bundleDescription: {
+              main_heading: "",
+              main_description: "",
+              product_details: [],
+              why_choose_us: [""]
+            }
           });
           dispatch(getsingleProductAsync(id));
         }
@@ -193,9 +218,9 @@ const UpdateProduct = () => {
       <section className="bg-[#E5E5E5] dark:bg-gray-900">
         <div className="py-8 px-18 sm:px-20 md:px-16 lg:px-14 mx-auto max-w-full lg:py-10">
           <h2 className="mb-5 playfair text-xl font-bold text-gray-900 dark:text-gray-100 sm:text-3xl">
-            {singleProduct?.category === "product"
-              ? "Update product"
-              : "Update bundle"}
+            {singleProduct?.category !== "Bundle"
+              ? "Update Product"
+              : "Update Bundle"}
           </h2>
           <form onSubmit={handleSubmit}>
             <div className="grid gap-4 sm:grid-cols-2 sm:gap-6">
@@ -361,7 +386,15 @@ const UpdateProduct = () => {
               )}
 
               {/* DESC */}
-              <div className="sm:col-span-2">
+                {singleProduct?.category === "Bundle" ? (
+                <div className="col-span-2">
+                <UpdateBundleDescription  
+                    formdata={formdata}
+                    setFormdata={setFormdata}/>
+                </div>
+              ) : (
+            
+            <div className="sm:col-span-2">
                 <label
                   className="block mb-1.5 text-sm font-medium text-gray-900 dark:text-white"
                   htmlFor="description"
@@ -378,7 +411,7 @@ const UpdateProduct = () => {
                     setFormdata({ ...formdata, description: e.target.value })
                   }
                 />
-              </div>
+              </div> )}
 
               {/* LATEST PRODUCTS */}
               {singleProduct?.category === "product" ? (
